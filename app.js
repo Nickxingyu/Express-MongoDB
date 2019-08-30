@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const mongo=require("mongodb")
 const mongoose=require('mongoose')
-mongoose.Connect('mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb')
+mongoose.connect('mongodb://localhost:27017/');
 mongoose.Promise=global.Promise
 const index = require('./routes/index')
 const users = require('./routes/users')
@@ -26,10 +26,6 @@ app.use(cookieParser())
 app.use(require('less-middleware')({ src: path.join(__dirname, 'public') }))
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use(function(req,res,next){
-    req.db=db
-    next()
-})
 app.use('/', index)
 app.use('/users', users)
 app.get('/about',about)
