@@ -61,4 +61,21 @@ router.get('/deleteAll/:id',(req,res,next)=>{//刪除所有ID和url中id欄位�
   res.end('You delete all')
 })
 
+router.get('/modifyYourEmail/:id/:email',(req,res,next)=>{
+  userId=req.params.id
+  modifyEmail=req.params.email
+  if(!id.find({ID:userId})){
+    res.end('User is not found.')
+  }
+  else{
+    id.updateOne({ID:userId},{$set:{email:modifyEmail}},(err,docs)=>{
+      if(err) console.log("This is an err for user.js 72")
+      else {
+        console.log(docs)
+        res.end('Success to update ')
+      }
+    })
+  }
+})
+
 module.exports = router;
