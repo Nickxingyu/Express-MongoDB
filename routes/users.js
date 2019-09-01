@@ -9,7 +9,35 @@ router.get('/', function(req, res,next) {
   res.send('respond with a resource')
 });
 
-router.post('/signup',(req,res,next)=>{
+router.get('/signup/:email/:password',(req,res,next)=>{
+  userEmail=req.params.email
+  userPassword=req.params.password
+  UserDB.findOne({email:userEmail},{email:1},(err,docs)=>{
+    if(docs){ res.end('This email is already used.') }
+    else{
+      UserDB.findOne({password:userPassword},{password:1},(err,docs)=>{
+        if(docs){ res.end('This password is already used.') }
+        else{
+          let userData=new UserDB({email:userEmail,password:userPassword,point:0})
+          userData.save((err,docs)=>{
+            if(err) console.log(err)
+            else {
+              res.end("Success to Sign up \n"+docs)
+            }
+          })
+        }
+      })
+    }
+  })
+/*  if(UserDB.find({email:userEmail}))  {
+    res.end('This email is already used.')
+  }
+  else if(UserDB.find({password:userPassword})) {
+    res.end('This password is already used')
+  }*/
+ // else {
+})
+/*router.post('/signup',(req,res,next)=>{
   let userEmail=req.body['email']
   let userPassword=req.body['passward']
   if(UserDB.find({email:userEmail})){
@@ -22,7 +50,7 @@ router.post('/signup',(req,res,next)=>{
     res.end()
   }
 })
-
+*/
 router.get('/test/:id/:name/:email',(req,res,next)=>{
   console.log(req.params.id)
   idYouGet=req.params.id

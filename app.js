@@ -4,10 +4,14 @@ const favicon = require('static-favicon')
 const logger = require('morgan')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
+const helmet=require('helmet')
 const mongo=require("mongodb")
 const mongoose=require('mongoose')
 mongoose.connect('mongodb://localhost:27017/');
 mongoose.Promise=global.Promise
+
+
+
 const index = require('./routes/index')
 const users = require('./routes/users')
 const about=require('./routes/about')
@@ -18,6 +22,7 @@ var app = express()
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'hjs')
 
+app.use(helmet())
 app.use(favicon())
 app.use(logger('dev'))
 app.use(bodyParser.json())
