@@ -1,7 +1,7 @@
 const express = require('express')
 const UserDB=require('../DB/UserDB')
 const id=require('../DB/idtest')
-const query=require('querystring')
+const bcrypt=require('bcrypt')
 const router = express.Router()
 
 /* GET users listing. */
@@ -9,26 +9,25 @@ router.get('/', function(req, res,next) {
   res.send('respond with a resource')
 });
 
-router.get('/signup/:email/:password',(req,res,next)=>{
-  userEmail=req.params.email
-  userPassword=req.params.password
-  UserDB.findOne({email:userEmail},{email:1},(err,docs)=>{
+router.post('/signup/',(req,res,next)=>{
+  //console.log(req.body)
+  userEmail=req.body.email;
+  //console.log(userEmail);
+  userPassword=req.body.password;
+  //console.log(userPassword);
+  UserDB.findOne({email:userEmail},{email:1,password:1},(err,docs)=>{
+    console.log(docs)
     if(docs){ res.end('This email is already used.') }
     else{
-      UserDB.findOne({password:userPassword},{password:1},(err,docs)=>{
-        if(docs){ res.end('This password is already used.') }
-        else{
-          let userData=new UserDB({email:userEmail,password:userPassword,point:0})
+          let userData=new UserDB({email:userEmail,password:bcrypt.hashSync(userPassword,10),point:0})
           userData.save((err,docs)=>{
             if(err) console.log(err)
             else {
-              res.end("Success to Sign up \n"+docs)
+              res.json(docs)
             }
           })
         }
       })
-    }
-  })
 /*  if(UserDB.find({email:userEmail}))  {
     res.end('This email is already used.')
   }
