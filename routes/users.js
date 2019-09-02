@@ -19,9 +19,6 @@ router.post('/signup/',(req,res,next)=>{
     console.log(docs)
     if(docs){ res.end('This email is already used.') }
     else{
-      UserDB.findOne({password:userPassword},{password:1},(err,docs)=>{
-        if(docs){ res.end('This password is already used.') }
-        else{
           let userData=new UserDB({email:userEmail,password:bcrypt.hashSync(userPassword,10),point:0})
           userData.save((err,docs)=>{
             if(err) console.log(err)
@@ -31,8 +28,6 @@ router.post('/signup/',(req,res,next)=>{
           })
         }
       })
-    }
-  })
 /*  if(UserDB.find({email:userEmail}))  {
     res.end('This email is already used.')
   }
