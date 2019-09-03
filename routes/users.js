@@ -1,7 +1,9 @@
 const express = require('express')
+const config=require('../controller/config')
 const UserDB=require('../DB/UserDB')
 const id=require('../DB/idtest')
 const bcrypt=require('bcrypt')
+const JWT=require('jsonwebtoken')
 const router = express.Router()
 
 /* GET users listing. */
@@ -15,7 +17,7 @@ router.post('/signup/',(req,res,next)=>{
   //console.log(userEmail);
   userPassword=req.body.password;
   //console.log(userPassword);
-  UserDB.findOne({email:userEmail},{email:1,password:1},(err,docs)=>{
+  UserDB.findOne({email:userEmail},(err,docs)=>{
     console.log(docs)
     if(docs){ res.end('This email is already used.') }
     else{
@@ -28,28 +30,53 @@ router.post('/signup/',(req,res,next)=>{
           })
         }
       })
-/*  if(UserDB.find({email:userEmail}))  {
-    res.end('This email is already used.')
-  }
-  else if(UserDB.find({password:userPassword})) {
-    res.end('This password is already used')
-  }*/
- // else {
 })
-/*router.post('/signup',(req,res,next)=>{
-  let userEmail=req.body['email']
-  let userPassword=req.body['passward']
-  if(UserDB.find({email:userEmail})){
-    res.write("This email is used")
-    res.end()
-  }
-  else{
-    UserDB.add({'email':userEmail,'passward':userPassword})
-    res.write('succeed')
-    res.end()
-  }
+
+
+router.post('/login/',(req,res,next)=>{
+  let userEmail=req.body.email
+  let userPassword=req.body.password
+  UserDB.findOne({email:userEmail},(err,docs)=>{
+    if(!docs){
+      res.json({'Success':'false',
+                'Messenge':'This user is not found.'})
+
+    }else if(!bcrypt.compareSync(userPassword,docs.password)){
+      res.json({'Success':'false',
+                'Messenge':'Your password is wrong.'})
+
+    }else{
+      let payload={
+        'email':docs.email,
+        'password':docs.password
+      }
+      let token=JWT.sign(payload,config.secret)
+      res.append('Authorization',token)
+      res.json({'Success':'true','Messenge':'You get a token.'})
+    }
+  })
 })
-*/
+
+router.get('/getpoint',(req,res,next)=>{
+  //let Email=req.body.email
+  //let Password=req.body.password
+  let authorization=req.headers.authorization
+  let jwtoken=authorization.split(' ')
+  console.log(jwtoken[1])
+  JWT.verify(jwtoken[1],config.secret,(err,payload)=>{
+    UserDB.findOne({email:payload.email},(err,docs)=>{
+      console.log(docs)
+      res.json({
+        "Status":"Success",
+        "Messenge":"Your point is "+docs.point
+      })
+    })
+    console.log(payload)
+  })
+})
+
+
+
 router.get('/test/:id/:name/:email',(req,res,next)=>{
   console.log(req.params.id)
   idYouGet=req.params.id
@@ -87,6 +114,7 @@ router.get('/deleteAll/:id',(req,res,next)=>{//刪除所有ID和url中id欄位�
   })
   res.end('You delete all')
 })
+
 
 router.get('/modifyYourEmail/:id/:email',(req,res,next)=>{
   userId=req.params.id
