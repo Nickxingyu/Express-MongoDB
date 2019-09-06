@@ -1,4 +1,4 @@
 module.exports={
     'secret':'XingyuPracticeJWT',
-    'database':'mongodb://localhost:27017/'
+    'database':'mongodb://myUserAdmin:nick0723lion@localhost:27017/'
 }
